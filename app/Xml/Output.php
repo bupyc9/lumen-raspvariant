@@ -48,15 +48,52 @@ class Output
         foreach ($this->graphs as $graph) {
             foreach ($graph->getEvents() as $event) {
                 [$startHour, $startMinute] = explode(':', $event->getStart());
-                $start = $startHour * 60 + $startMinute;
+                $start = (int)$startHour * 60 + (int)$startMinute;
 
                 [$endHour, $endMinute] = explode(':', $event->getEnd());
-                $end = $endHour * 60 + $endMinute;
+                $end = (int)$endHour * 60 + (int)$endMinute;
 
                 $time += $end - $start;
             }
         }
 
         return $time;
+    }
+
+    public function getStops(string $from, string $to): Collection
+    {
+        $collection = collect([]);
+
+        [$fromHour, $fromMinute] = explode(':', $from);
+        $from = (int)$fromHour * 60 + (int)$fromMinute;
+
+        [$toHour, $toMinute] = explode(':', $to);
+        $to = (int)$toHour * 60 + (int)$toMinute;
+
+        foreach ($this->graphs as $graph) {
+            foreach ($graph->getEvents() as $event) {
+                /** @var Collection|Stop[] $stops */
+                $stops = $event->getStops()->filter(
+                    function (Stop $stop) use ($from, $to) {
+                        [$timeHour, $timeMinute] = explode(':', $stop->getTime());
+                        $time = $timeHour * 60 + $timeMinute;
+
+                        return $time >= $from && $time <= $to;
+                    }
+                );
+
+                foreach ($stops as $stop) {
+                    $collection->push(
+                        [
+                            'stop' => $stop,
+                            'graph' => $graph,
+                            'event' => $event,
+                        ]
+                    );
+                }
+            }
+        }
+
+        return $collection;
     }
 }

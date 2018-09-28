@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Console\Commands\CountEventsCommand;
+use App\Console\Commands\StopsCommand;
 use App\Console\Commands\TotalTimeEventsCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
@@ -17,6 +18,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         CountEventsCommand::class,
         TotalTimeEventsCommand::class,
+        StopsCommand::class,
     ];
 
     /**

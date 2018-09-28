@@ -14,7 +14,7 @@ class TotalTimeEventsCommand extends Command
 {
     protected $signature = 'xml:parse:total_time_events {filePath} {num}';
 
-    protected $description = 'Parsing xml';
+    protected $description = 'Total time events by num';
 
     /**
      * @throws ParserException
