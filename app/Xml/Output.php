@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
  */
 class Output
 {
+    /** @var Collection|Graph[] */
     private $graphs;
 
     public function __construct()
@@ -29,5 +30,15 @@ class Output
         $this->graphs->push($graph);
 
         return $this;
+    }
+
+    public function countEvents(): int
+    {
+        $count = 0;
+        foreach ($this->graphs as $graph) {
+            $count += $graph->getEvents()->count();
+        }
+
+        return $count;
     }
 }
