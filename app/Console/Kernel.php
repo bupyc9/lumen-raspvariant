@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Console\Commands\CountEventsCommand;
+use App\Console\Commands\ParseCommand;
 use App\Console\Commands\StopsCommand;
 use App\Console\Commands\TotalTimeEventsCommand;
 use Illuminate\Console\Scheduling\Schedule;
@@ -16,6 +17,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
+        ParseCommand::class,
         CountEventsCommand::class,
         TotalTimeEventsCommand::class,
         StopsCommand::class,

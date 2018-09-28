@@ -2,6 +2,7 @@
 
 namespace App\Xml;
 
+use App\StopPoint;
 use Illuminate\Support\Collection;
 
 /**
@@ -11,7 +12,7 @@ class Parser
 {
     /**
      * @param string $filePath
-     * @return Collection
+     * @return Collection|Output[]
      * @throws ParserException
      */
     public static function parse(string $filePath): Collection
@@ -19,6 +20,8 @@ class Parser
         if (!\file_exists($filePath)) {
             throw new ParserException('File does not exist');
         }
+
+        $stopPoints = StopPoint::all()->pluck('name', 'external_id');
 
         $xml = \simplexml_load_string(\file_get_contents($filePath));
         $collection = collect([]);
@@ -35,34 +38,18 @@ class Parser
             $output->addGraph($graph);
 
             $eventElements = $graphElement->xpath('event');
-            self::processEvents($eventElements, $graph);
+            self::processEvents($eventElements, $graph, $stopPoints);
         }
 
         return $collection;
     }
 
     /**
-     * @param \SimpleXMLElement[] $stopElements
-     * @param Event $event
-     */
-    private static function processStop($stopElements, Event $event): void
-    {
-        foreach ($stopElements as $stopElement) {
-            $stop = new Stop(
-                (int)$stopElement['st_id'],
-                (string)$stopElement['time'],
-                ''
-            );
-
-            $event->addStop($stop);
-        }
-    }
-
-    /**
      * @param \SimpleXMLElement[] $eventElements
-     * @param $graph
+     * @param Graph $graph
+     * @param Collection $stopPoints
      */
-    private static function processEvents($eventElements, Graph $graph): void
+    private static function processEvents($eventElements, Graph $graph, Collection $stopPoints): void
     {
         foreach ($eventElements as $eventElement) {
             $event = new Event(
@@ -73,7 +60,25 @@ class Parser
             $graph->addEvent($event);
 
             $stopElements = $eventElement->xpath('stop');
-            self::processStop($stopElements, $event);
+            self::processStop($stopElements, $event, $stopPoints);
+        }
+    }
+
+    /**
+     * @param \SimpleXMLElement[] $stopElements
+     * @param Event $event
+     * @param Collection $stopPoints
+     */
+    private static function processStop($stopElements, Event $event, Collection $stopPoints): void
+    {
+        foreach ($stopElements as $stopElement) {
+            $stop = new Stop(
+                (int)$stopElement['st_id'],
+                (string)$stopElement['time'],
+                $stopPoints[(int)$stopElement['st_id']]
+            );
+
+            $event->addStop($stop);
         }
     }
 }
