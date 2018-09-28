@@ -110,8 +110,11 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 	    && composer --version
 
 COPY ./php.ini /usr/local/etc/php/conf.d
+COPY ./wait-for-it.sh /wait-for-it.sh
 
 USER root
+
+RUN chmod +x /wait-for-it.sh
 
 # Clean up
 RUN apt-get clean && \

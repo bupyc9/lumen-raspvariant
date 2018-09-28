@@ -27,6 +27,7 @@ services:
         - INSTALL_XDEBUG=true
     volumes:
       - ./:/var/www:cached
+    command: sh -c 'composer install; /wait-for-it.sh postgres:5432 -t 60; php artisan migrate; /bin/bash'
     tty: true
     networks:
       - default
