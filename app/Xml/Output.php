@@ -41,4 +41,22 @@ class Output
 
         return $count;
     }
+
+    public function totalTimeEvents(): int
+    {
+        $time = 0;
+        foreach ($this->graphs as $graph) {
+            foreach ($graph->getEvents() as $event) {
+                [$startHour, $startMinute] = explode(':', $event->getStart());
+                $start = $startHour * 60 + $startMinute;
+
+                [$endHour, $endMinute] = explode(':', $event->getEnd());
+                $end = $endHour * 60 + $endMinute;
+
+                $time += $end - $start;
+            }
+        }
+
+        return $time;
+    }
 }
